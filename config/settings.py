@@ -3,6 +3,7 @@ from datetime import timedelta
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,13 +13,17 @@ load_dotenv(BASE_DIR / '.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', '')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ImproperlyConfigured('Set SECRET_KEY in the environment.')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -71,13 +76,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": 'noteapp_db',
+        "NAME": os.environ.get('DB_NAME', 'noteapp_db'),
         "USER": os.environ.get('DB_USER', ''),
         "PASSWORD": os.environ.get('DB_PASSWORD', ''),
-        "HOST": 'localhost',
-        "PORT": '3306',
+        "HOST": os.environ.get('DB_HOST', 'localhost'),
+        "PORT": os.environ.get('DB_PORT', '3306'),
     }
 }
+if not DATABASES['default']['USER'] or not DATABASES['default']['PASSWORD']:
+    raise ImproperlyConfigured('Set DB_USER and DB_PASSWORD in the environment.')
 
 
 # Password validation
@@ -115,6 +122,36 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# Production security settings; enable HSTS only after HTTPS is confirmed.
+SECURE_SSL_REDIRECT = os.environ.get(
+    'SECURE_SSL_REDIRECT',
+    str(not DEBUG),
+).lower() == 'true'
+SESSION_COOKIE_SECURE = os.environ.get(
+    'SESSION_COOKIE_SECURE',
+    str(not DEBUG),
+).lower() == 'true'
+CSRF_COOKIE_SECURE = os.environ.get(
+    'CSRF_COOKIE_SECURE',
+    str(not DEBUG),
+).lower() == 'true'
+SECURE_HSTS_SECONDS = int(os.environ.get('SECURE_HSTS_SECONDS', '0'))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get(
+    'SECURE_HSTS_INCLUDE_SUBDOMAINS',
+    'false',
+).lower() == 'true'
+SECURE_HSTS_PRELOAD = os.environ.get(
+    'SECURE_HSTS_PRELOAD',
+    'false',
+).lower() == 'true'
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
 
 
 # Email
