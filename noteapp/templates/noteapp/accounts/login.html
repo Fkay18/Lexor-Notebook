@@ -1,0 +1,29 @@
+{% extends 'noteapp/base.html' %}
+
+{% block title %}Log in | Notebook{% endblock %}
+
+{% block content %}
+<div class="page-wrap auth-page">
+    <section class="auth-card" aria-labelledby="auth-title">
+        <p class="eyebrow">Welcome</p>
+        <h1 id="auth-title">Log in to Notebook</h1>
+        <p class="auth-intro">Sign in to get back to your notes.</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            {% for field in form %}
+                <div class="auth-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+            <p class="auth-forgot-password"><a href="{% url 'password_reset' %}">Forgot your password?</a></p>
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            <button class="auth-submit" type="submit">Log in</button>
+        </form>
+        <p class="auth-switch">New to Notebook? <a href="{% url 'sign_up' %}">Create an account</a></p>
+    </section>
+</div>
+{% endblock %}

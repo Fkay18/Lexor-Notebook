@@ -1,0 +1,20 @@
+{% extends 'noteapp/base.html' %}
+
+{% block title %}Delete {{ note.title }} | Notebook{% endblock %}
+
+{% block content %}
+<div class="page-wrap auth-page">
+    <section class="auth-card delete-card" aria-labelledby="delete-title">
+        <p class="eyebrow">Please confirm</p>
+        <h1 id="delete-title">Delete this note?</h1>
+        <p class="auth-intro">“{{ note.title }}” will be permanently deleted. This can’t be undone.</p>
+        <div class="note-actions">
+            <a class="action-button action-button--secondary" href="{% url 'note_detail' note.pk %}">Keep note</a>
+            <form method="post">
+                {% csrf_token %}
+                <button class="action-button action-button--danger" type="submit">Delete note</button>
+            </form>
+        </div>
+    </section>
+</div>
+{% endblock %}

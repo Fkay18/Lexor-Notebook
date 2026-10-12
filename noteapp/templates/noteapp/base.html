@@ -1,0 +1,84 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f7f8fc">
+    <title>{% block title %}Notebook{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'noteapp/css/style.css' %}?v=12">
+    <script src="{% static 'noteapp/js/theme.js' %}?v=4" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-wrap" aria-label="Main navigation">
+            <a class="brand" href="{% url 'note_list' %}">
+                <span class="brand-mark" aria-hidden="true">N</span>
+                <span>Lexor Notebook</span>
+            </a>
+            <div class="nav-links">
+                <details class="nav-menu">
+                    <summary class="nav-menu__trigger" aria-label="Open menu" title="Open menu">
+                        <svg class="nav-menu__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>
+                        </svg>
+                    </summary>
+                    <div class="nav-menu__panel">
+                        {% if user.is_authenticated %}
+                            <p class="nav-menu__label">Signed in as <strong>{{ user.get_username }}</strong></p>
+                        {% else %}
+                            <a class="nav-menu__link" href="{% url 'login' %}">Log in</a>
+                            <a class="nav-menu__link" href="{% url 'sign_up' %}">Create an account</a>
+                        {% endif %}
+                        <div class="nav-menu__theme-row">
+                            <span>Appearance</span>
+                            <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle light and dark mode" aria-pressed="false" title="Switch to dark mode"><span class="theme-toggle__icon" aria-hidden="true"></span></button>
+                        </div>
+                        {% if user.is_authenticated %}
+                            <form class="nav-logout-form" action="{% url 'logout' %}" method="post">
+                                {% csrf_token %}
+                                <button class="nav-menu__link nav-logout-button" type="submit">Log out</button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-wrap">
+            <div class="footer-about">
+                <a class="footer-brand" href="{% url 'note_list' %}">
+                    <span class="brand-mark" aria-hidden="true">N</span>
+                    <span>Notebook</span>
+                </a>
+                <p class="footer-note">A quiet, personal space for your thoughts and ideas.</p>
+            </div>
+            <nav class="footer-links" aria-label="Footer navigation">
+                <h2>Your space</h2>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'note_list' %}">My notes</a>
+                    <a href="{% url 'note_create' %}">Write a note</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Log in</a>
+                    <a href="{% url 'sign_up' %}">Create an account</a>
+                {% endif %}
+            </nav>
+            <div class="footer-contact">
+                <h2>Get in touch</h2>
+                <a href="mailto:your-email@example.com">your-email@example.com</a>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; {% now "Y" %} Notebook</span>
+                <span>Made for your thoughts.</span>
+            </div>
+        </div>
+    </footer>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

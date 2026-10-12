@@ -1,0 +1,56 @@
+{% extends 'noteapp/base.html' %}
+{% load static %}
+
+{% block title %}{% if is_edit %}Edit note{% else %}New note{% endif %} | Notebook{% endblock %}
+
+{% block content %}
+{% if is_edit %}
+<div class="page-wrap auth-page">
+    <section class="auth-card note-form-card" aria-labelledby="note-form-title">
+        <a class="back-button" href="{% if is_edit %}{% url 'note_detail' note.pk %}{% else %}{% url 'note_list' %}{% endif %}">
+            <span aria-hidden="true">&larr;</span> Cancel
+        </a>
+        <p class="eyebrow">{% if is_edit %}Make it yours{% else %}Capture a thought{% endif %}</p>
+        <h1 id="note-form-title">{% if is_edit %}Edit note{% else %}Create a note{% endif %}</h1>
+        <p class="auth-intro">Your notes are private to your account.</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="auth-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
+                </div>
+            {% endfor %}
+            <button class="auth-submit" type="submit">{% if is_edit %}Save changes{% else %}Create note{% endif %}</button>
+        </form>
+    </section>
+</div>
+{% else %}
+<div class="page-wrap note-editor-page">
+    <header class="note-editor-toolbar">
+        <a class="note-editor-back" href="{% url 'note_list' %}" aria-label="Back to notes">
+            <span aria-hidden="true">&larr;</span><span>Notes</span>
+        </a>
+        <span class="note-save-status" id="note-save-status" role="status" aria-live="polite">Not saved yet</span>
+    </header>
+    <section class="note-editor" aria-labelledby="note-editor-heading">
+        <p class="eyebrow" id="note-editor-heading">New note</p>
+        <form method="post" class="note-editor-form" id="note-editor-form" data-autosave-url="{% url 'note_autosave' %}">
+            {% csrf_token %}
+            <label class="visually-hidden" for="{{ form.title.id_for_label }}">Title</label>
+            {{ form.title }}
+            <label class="visually-hidden" for="{{ form.content.id_for_label }}">Note text</label>
+            {{ form.content }}
+            {% if form.errors %}<div class="field-errors" role="alert">{{ form.errors }}</div>{% endif %}
+            <noscript><button class="auth-submit" type="submit">Create note</button></noscript>
+        </form>
+    </section>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not is_edit %}<script src="{% static 'noteapp/js/note_editor.js' %}?v=1" defer></script>{% endif %}
+{% endblock %}

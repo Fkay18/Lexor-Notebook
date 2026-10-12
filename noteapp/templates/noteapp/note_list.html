@@ -1,0 +1,39 @@
+{% extends 'noteapp/base.html' %}
+
+{% block title %}My Notes | Notebook{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+    <header class="page-heading">
+        <p class="eyebrow">Your personal space</p>
+        <div class="page-heading__row">
+            <div>
+                <h1>My Notes</h1>
+                <p>Keep your thoughts, plans, and little reminders in one place.</p>
+            </div>
+            <a class="action-button" href="{% url 'note_create' %}">New note</a>
+        </div>
+    </header>
+
+    {% if notes %}
+        <section class="note-grid" aria-label="Notes">
+            {% for note in notes %}
+                <article class="note-card">
+                    <h2><a class="note-title-link" href="{% url 'note_detail' note.pk %}">{{ note.title }}</a></h2>
+                    <p class="note-card__content">{{ note.preview|default:'This note is empty.'|truncatechars:140 }}</p>
+                    <time class="note-card__date" datetime="{{ note.updated_at|date:'c' }}">
+                        Updated {{ note.updated_at|date:"M j, Y" }} at {{ note.updated_at|date:"g:i a" }}
+                    </time>
+                </article>
+            {% endfor %}
+        </section>
+    {% else %}
+        <section class="empty-state" aria-labelledby="empty-title">
+            <span class="empty-state__icon" aria-hidden="true">N</span>
+            <h2 id="empty-title">Your page is ready</h2>
+            <p>There are no notes here yet. Start with a thought, plan, or reminder.</p>
+            <a class="action-button" href="{% url 'note_create' %}">Create your first note</a>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

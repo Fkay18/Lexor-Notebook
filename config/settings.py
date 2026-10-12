@@ -1,9 +1,12 @@
 
+from datetime import timedelta
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +30,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'noteapp.apps.NoteappConfig'
+    'noteapp.apps.NoteappConfig',
+    'rest_framework',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -115,8 +120,59 @@ STATIC_URL = 'static/'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+_email_smtp_requested = bool(
+    os.environ.get('EMAIL_HOST')
+    or (os.environ.get('EMAIL_HOST_USER') and os.environ.get('EMAIL_HOST_PASSWORD'))
+)
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.smtp.EmailBackend'
+    if _email_smtp_requested
+    else 'django.core.mail.backends.console.EmailBackend',
+)
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587' if EMAIL_HOST == 'smtp.gmail.com' else '25'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get(
+    'EMAIL_USE_TLS',
+    'true' if EMAIL_HOST == 'smtp.gmail.com' else 'false',
+).lower() == 'true'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', '').lower() == 'true'
+EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10'))
+DEFAULT_FROM_EMAIL = (
+    EMAIL_HOST_USER
+    if EMAIL_HOST == 'smtp.gmail.com' and EMAIL_HOST_USER
+    else os.environ.get(
+        'DEFAULT_FROM_EMAIL',
+        EMAIL_HOST_USER or 'Notebook <noreply@localhost>',
+    )
+)
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'note_list'
+LOGOUT_REDIRECT_URL = 'note_list'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Notebook API',
+    'DESCRIPTION': 'REST API for managing personal notes.',
+    'VERSION': '1.0.0',
 }
