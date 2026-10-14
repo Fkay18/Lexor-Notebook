@@ -75,18 +75,26 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ.get('DB_NAME', 'noteapp_db'),
-        "USER": os.environ.get('DB_USER', ''),
-        "PASSWORD": os.environ.get('DB_PASSWORD', ''),
-        "HOST": os.environ.get('DB_HOST', 'localhost'),
-        "PORT": os.environ.get('DB_PORT', '3306'),
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL),
     }
-}
-if not DATABASES['default']['USER'] or not DATABASES['default']['PASSWORD']:
-    raise ImproperlyConfigured('Set DB_USER and DB_PASSWORD in the environment.')
+else:
+    DATABASES = {
+        'default': {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.environ.get('DB_NAME', 'noteapp_db'),
+            "USER": os.environ.get('DB_USER', ''),
+            "PASSWORD": os.environ.get('DB_PASSWORD', ''),
+            "HOST": os.environ.get('DB_HOST', 'localhost'),
+            "PORT": os.environ.get('DB_PORT', '3306'),
+        }
+    }
+    if not DATABASES['default']['USER'] or not DATABASES['default']['PASSWORD']:
+        raise ImproperlyConfigured(
+            'Set DATABASE_URL, or configure DB_USER and DB_PASSWORD for MySQL.'
+        )
 
 
 # Password validation
@@ -217,9 +225,3 @@ SPECTACULAR_SETTINGS = {
 }
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
-    )
-}
