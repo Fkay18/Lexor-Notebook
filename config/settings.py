@@ -18,7 +18,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     raise ImproperlyConfigured('Set SECRET_KEY in the environment.')
 
-DEBUG = os.environ.get('DEBUG', 'false').lower() == 'true'
+DEBUG = os.environ.get('DEBUG', 'false').lower() == 'false'
 
 ALLOWED_HOSTS = [
     host.strip()
