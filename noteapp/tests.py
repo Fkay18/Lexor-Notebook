@@ -198,6 +198,20 @@ class NoteAPIAuthenticationTests(TestCase):
         self.assertEqual([note['id'] for note in response.data], [self.note.pk])
 
 
+@override_settings(
+    SECURE_SSL_REDIRECT=True,
+    SECURE_PROXY_SSL_HEADER=('HTTP_X_FORWARDED_PROTO', 'https'),
+)
+class RailwayHTTPSRedirectTests(TestCase):
+    def test_forwarded_https_request_is_not_redirected_again(self):
+        response = self.client.get(
+            '/accounts/sign-in/',
+            HTTP_X_FORWARDED_PROTO='https',
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+
 @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
 class PasswordResetTests(TestCase):
     def setUp(self):
