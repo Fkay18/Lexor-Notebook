@@ -1,7 +1,7 @@
 {% extends 'noteapp/base.html' %}
 {% load static %}
 
-{% block title %}{% if is_edit %}Edit note{% else %}New note{% endif %} | Notebook{% endblock %}
+{% block title %}{% if is_edit %}Edit note{% else %}New note{% endif %} | Lexor Notebook{% endblock %}
 
 {% block content %}
 {% if is_edit %}
@@ -37,14 +37,14 @@
     </header>
     <section class="note-editor" aria-labelledby="note-editor-heading">
         <p class="eyebrow" id="note-editor-heading">New note</p>
-        <form method="post" class="note-editor-form" id="note-editor-form" data-autosave-url="{% url 'note_autosave' %}">
+        <form method="post" class="note-editor-form" id="note-editor-form" data-autosave-url="{% url 'note_autosave' %}" data-home-url="{% url 'note_list' %}">
             {% csrf_token %}
             <label class="visually-hidden" for="{{ form.title.id_for_label }}">Title</label>
             {{ form.title }}
             <label class="visually-hidden" for="{{ form.content.id_for_label }}">Note text</label>
             {{ form.content }}
             {% if form.errors %}<div class="field-errors" role="alert">{{ form.errors }}</div>{% endif %}
-            <noscript><button class="auth-submit" type="submit">Create note</button></noscript>
+            <button class="action-button note-editor-submit" type="submit">Create note</button>
         </form>
     </section>
 </div>
@@ -52,5 +52,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-{% if not is_edit %}<script src="{% static 'noteapp/js/note_editor.js' %}?v=1" defer></script>{% endif %}
+{% if not is_edit %}<script src="{% static 'noteapp/js/note_editor.js' %}?v=2" defer></script>{% endif %}
 {% endblock %}

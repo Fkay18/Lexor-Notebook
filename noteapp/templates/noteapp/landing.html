@@ -1,0 +1,38 @@
+{% extends 'noteapp/base.html' %}
+
+{% block title %}Your thoughts, in one place | Lexor Notebook{% endblock %}
+
+{% block content %}
+<div class="page-wrap landing-page">
+    <section class="landing-hero" aria-labelledby="landing-title">
+        <div class="landing-copy">
+            <p class="eyebrow">A little room to think</p>
+            <h1 id="landing-title">Your thoughts, in one place.</h1>
+            <p class="landing-intro">Keep notes, plans, and everyday ideas together in a quiet, private space that’s yours.</p>
+            <div class="landing-actions">
+                <a class="action-button" href="{% url 'sign_up' %}">Create an account</a>
+                <a class="landing-login" href="{% url 'login' %}">Already have an account? Log in</a>
+            </div>
+        </div>
+        <aside class="product-preview" aria-label="Preview of a private notebook">
+            <div class="product-preview__top">
+                <span class="product-preview__mark" aria-hidden="true">L</span>
+                <span>My Notes</span>
+                <span class="product-preview__dots" aria-hidden="true">•••</span>
+            </div>
+            <p class="product-preview__label">A space for your ideas</p>
+            <article class="preview-note preview-note--lavender">
+                <span class="preview-note__tag">TODAY</span>
+                <h2>Small things to remember</h2>
+                <p>Make time for a walk. Write down the idea before it slips away.</p>
+            </article>
+            <article class="preview-note preview-note--peach">
+                <span class="preview-note__tag">PLANS</span>
+                <h2>Weekend thoughts</h2>
+                <p>A few plans, all in one place.</p>
+            </article>
+            <p class="product-preview__privacy"><span aria-hidden="true">●</span> Your notes stay private to your account</p>
+        </aside>
+    </section>
+</div>
+{% endblock %}

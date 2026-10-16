@@ -10,6 +10,67 @@ from rest_framework.test import APIClient
 from .models import Note
 
 
+class PublicHomeAndAuthenticationTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='reader',
+            email='reader@example.com',
+            password='Good-Password-123!',
+        )
+
+    def test_logged_out_homepage_explains_the_app_and_offers_auth_links(self):
+        response = self.client.get('/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Your thoughts, in one place.')
+        self.assertContains(response, 'Preview of a private notebook')
+        self.assertContains(response, 'href="/accounts/sign-up/"')
+        self.assertContains(response, 'href="/accounts/sign-in/"')
+        self.assertNotContains(response, 'your-email@example.com')
+        self.assertNotContains(response, 'Your space')
+        self.assertContains(response, 'Lexor Notebook')
+        self.assertContains(response, '&middot;')
+
+    def test_login_accepts_username_or_case_insensitive_email(self):
+        for identifier in ('reader', 'READER@example.com'):
+            with self.subTest(identifier=identifier):
+                self.client.logout()
+                response = self.client.post(
+                    '/accounts/sign-in/',
+                    {'username': identifier, 'password': 'Good-Password-123!'},
+                )
+
+                self.assertRedirects(response, '/')
+                self.assertEqual(self.client.session['_auth_user_id'], str(self.user.pk))
+                self.assertContains(self.client.get('/'), 'My Notes')
+
+    def test_signup_uses_plain_username_help_and_password_visibility_controls(self):
+        response = self.client.get('/accounts/sign-up/')
+
+        self.assertContains(
+            response,
+            'Choose up to 150 characters using letters, numbers, and @ . + - _.',
+        )
+        self.assertNotContains(response, 'Required. 150 characters or fewer.')
+        self.assertContains(response, 'data-password-toggle="id_password1"')
+        self.assertContains(response, 'data-password-toggle="id_password2"')
+
+    def test_signup_logs_user_in_and_returns_to_their_notes(self):
+        response = self.client.post(
+            '/accounts/sign-up/',
+            {
+                'username': 'new-reader',
+                'email': 'new-reader@example.com',
+                'password1': 'Good-Password-456!',
+                'password2': 'Good-Password-456!',
+            },
+        )
+
+        self.assertRedirects(response, '/')
+        self.assertContains(self.client.get('/'), 'My Notes')
+        self.assertTrue(User.objects.filter(username='new-reader').exists())
+
+
 class NoteCrudTests(TestCase):
     def setUp(self):
         self.owner = User.objects.create_user(username='owner', password='test-password')
@@ -59,7 +120,8 @@ class NoteCrudTests(TestCase):
         self.client.force_login(self.owner)
         response = self.client.get('/notes/new/')
         self.assertContains(response, 'note-save-status')
-        self.assertContains(response, 'note_editor.js')
+        self.assertContains(response, 'Create note')
+        self.assertContains(response, 'note_editor.')
         response = self.client.post(
             '/notes/new/',
             {
@@ -70,12 +132,12 @@ class NoteCrudTests(TestCase):
         )
 
         note = Note.objects.get(title='New note')
-        self.assertRedirects(response, f'/notes/{note.pk}/')
+        self.assertRedirects(response, '/')
+        self.assertContains(self.client.get('/'), 'New note')
         self.assertEqual(note.owner, self.owner)
 
     def test_note_routes_require_login(self):
         paths = [
-            '/',
             '/notes/new/',
             '/notes/autosave/',
             f'/notes/{self.note.pk}/',

@@ -5,9 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f7f8fc">
-    <title>{% block title %}Notebook{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'noteapp/css/style.css' %}?v=12">
-    <script src="{% static 'noteapp/js/theme.js' %}?v=4" defer></script>
+    <title>{% block title %}Lexor Notebook{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'noteapp/css/style.css' %}?v=13">
+    <script src="{% static 'noteapp/js/theme.js' %}?v=5" defer></script>
 </head>
 <body>
     <header class="site-header">
@@ -59,23 +59,9 @@
                 </a>
                 <p class="footer-note">A quiet, personal space for your thoughts and ideas.</p>
             </div>
-            <nav class="footer-links" aria-label="Footer navigation">
-                <h2>Your space</h2>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'note_list' %}">My notes</a>
-                    <a href="{% url 'note_create' %}">Write a note</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Log in</a>
-                    <a href="{% url 'sign_up' %}">Create an account</a>
-                {% endif %}
-            </nav>
-            <div class="footer-contact">
-                <h2>Get in touch</h2>
-                <a href="mailto:your-email@example.com">your-email@example.com</a>
-            </div>
             <div class="footer-bottom">
-                <span>&copy; {% now "Y" %} Notebook</span>
-                <span>Made for your thoughts.</span>
+                <span>&copy; {% now "Y" %} Lexor Notebook</span>
+                <span><span aria-hidden="true">&middot;</span> Made for your thoughts.</span>
             </div>
         </div>
     </footer>

@@ -1,6 +1,6 @@
 {% extends 'noteapp/base.html' %}
 
-{% block title %}Create account | Notebook{% endblock %}
+{% block title %}Create account | Lexor Notebook{% endblock %}
 
 {% block content %}
 <div class="page-wrap auth-page">
@@ -15,7 +15,14 @@
             {% for field in form %}
                 <div class="auth-field">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
+                    {% if field.name == 'password1' or field.name == 'password2' %}
+                        <div class="password-input-wrap">
+                            {{ field }}
+                            <button class="password-toggle" type="button" data-password-toggle="{{ field.id_for_label }}" aria-controls="{{ field.id_for_label }}" aria-label="Show password">Show</button>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
                     {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
                     {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
                 </div>

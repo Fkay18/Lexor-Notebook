@@ -47,6 +47,18 @@
             });
         }
 
+        document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+            const input = document.getElementById(button.dataset.passwordToggle);
+            if (!input) return;
+
+            button.addEventListener('click', () => {
+                const showPassword = input.type === 'password';
+                input.type = showPassword ? 'text' : 'password';
+                button.textContent = showPassword ? 'Hide' : 'Show';
+                button.setAttribute('aria-label', `${showPassword ? 'Hide' : 'Show'} password`);
+            });
+        });
+
         const menu = document.querySelector('.nav-menu');
         if (menu) {
             document.addEventListener('click', (event) => {

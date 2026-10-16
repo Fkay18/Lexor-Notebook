@@ -9,8 +9,10 @@ from .forms import NoteForm, SignUpForm
 from .models import Note
 
 
-@login_required
 def note_list(request):
+    if not request.user.is_authenticated:
+        return render(request, 'noteapp/landing.html')
+
     notes = Note.objects.filter(owner=request.user)
     for note in notes:
         note.preview = next(
@@ -35,7 +37,7 @@ def note_create(request):
             note = form.save(commit=False)
             note.owner = request.user
             note.save()
-            return redirect('note_detail', pk=note.pk)
+            return redirect('note_list')
     else:
         form = NoteForm()
 

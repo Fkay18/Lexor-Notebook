@@ -10,7 +10,7 @@
     let timer = null;
     let version = 0;
     let lastSavedVersion = 0;
-    let isSaving = false;
+    let savePromise = null;
     let saveAgain = false;
 
     function makePayload() {
@@ -22,12 +22,7 @@
         return payload;
     }
 
-    async function save() {
-        if (isSaving) {
-            saveAgain = true;
-            return false;
-        }
-        isSaving = true;
+    async function performSave() {
         let saved = false;
 
         do {
@@ -66,8 +61,21 @@
             if (version !== saveVersion) saveAgain = true;
         } while (saveAgain);
 
-        isSaving = false;
         return saved;
+    }
+
+    async function save() {
+        if (savePromise) {
+            saveAgain = true;
+            return savePromise;
+        }
+
+        savePromise = performSave();
+        try {
+            return await savePromise;
+        } finally {
+            savePromise = null;
+        }
     }
 
     function scheduleSave() {
@@ -82,13 +90,13 @@
         event.preventDefault();
         window.clearTimeout(timer);
         if (await save() && noteId !== null) {
-            window.location.assign(`/notes/${noteId}/`);
+            window.location.assign(form.dataset.homeUrl);
         }
     });
 
     window.addEventListener('pagehide', () => {
         window.clearTimeout(timer);
-        if (!isSaving && version > lastSavedVersion && (title.value.trim() || content.value.trim())) {
+        if (!savePromise && version > lastSavedVersion && (title.value.trim() || content.value.trim())) {
             navigator.sendBeacon(form.dataset.autosaveUrl, makePayload());
         }
     });

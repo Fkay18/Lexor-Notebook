@@ -1,11 +1,16 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Note
 
 
 class SignUpForm(UserCreationForm):
+    username = forms.CharField(
+        label='Username',
+        help_text='Choose up to 150 characters using letters, numbers, and @ . + - _.',
+    )
     email = forms.EmailField(required=True, label='Email address')
 
     class Meta(UserCreationForm.Meta):
@@ -17,6 +22,27 @@ class SignUpForm(UserCreationForm):
         if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError('An account with this email address already exists.')
         return email
+
+
+class EmailOrUsernameAuthenticationForm(AuthenticationForm):
+    username = forms.CharField(
+        label='Username or email address',
+        widget=forms.TextInput(attrs={
+            'autofocus': True,
+            'autocomplete': 'username',
+            'placeholder': 'Username or email address',
+        }),
+    )
+
+    def clean(self):
+        identifier = self.cleaned_data.get('username')
+        if identifier and '@' in identifier:
+            user = get_user_model().objects.filter(
+                email__iexact=identifier,
+            ).only('username').first()
+            if user:
+                self.cleaned_data['username'] = user.get_username()
+        return super().clean()
 
 
 class NoteForm(forms.ModelForm):

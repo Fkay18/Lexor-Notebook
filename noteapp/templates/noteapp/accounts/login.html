@@ -1,6 +1,6 @@
 {% extends 'noteapp/base.html' %}
 
-{% block title %}Log in | Notebook{% endblock %}
+{% block title %}Log in | Lexor Notebook{% endblock %}
 
 {% block content %}
 <div class="page-wrap auth-page">
@@ -8,6 +8,7 @@
         <p class="eyebrow">Welcome</p>
         <h1 id="auth-title">Log in to Lexor Notebook</h1>
         <p class="auth-intro">Sign in to get back to your notes.</p>
+        <p class="auth-switch"><a href="{% url 'note_list' %}">Back to the homepage</a></p>
 
         <form method="post" class="auth-form">
             {% csrf_token %}
@@ -15,7 +16,14 @@
             {% for field in form %}
                 <div class="auth-field">
                     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
+                    {% if field.name == 'password' %}
+                        <div class="password-input-wrap">
+                            {{ field }}
+                            <button class="password-toggle" type="button" data-password-toggle="{{ field.id_for_label }}" aria-controls="{{ field.id_for_label }}" aria-label="Show password">Show</button>
+                        </div>
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
                     {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
                 </div>
             {% endfor %}
@@ -23,7 +31,7 @@
             {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
             <button class="auth-submit" type="submit">Log in</button>
         </form>
-        <p class="auth-switch">New to Notebook? <a href="{% url 'sign_up' %}">Create an account</a></p>
+        <p class="auth-switch">New to Lexor Notebook? <a href="{% url 'sign_up' %}">Create an account</a></p>
     </section>
 </div>
 {% endblock %}
