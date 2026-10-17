@@ -1,3 +1,12 @@
+/* Lexor Notebook stylesheet
+   1. Foundations and shared layout
+   2. Notes and detail views
+   3. Themes and account pages
+   4. Note editor and landing page
+   5. Responsive layouts
+*/
+
+/* Foundations: theme tokens and global defaults */
 :root {
             color-scheme: light;
             --ink: #20243a;
@@ -20,6 +29,8 @@
             line-height: 1.6;
         }
         a { color: inherit; }
+
+        /* Header and navigation */
         .site-header {
             position: sticky;
             top: 0;
@@ -132,6 +143,8 @@
             color: var(--muted);
             font-size: .86rem;
         }
+
+        /* Shared page layout and note list */
         main { flex: 1; }
         .page-wrap { padding-block: 52px 72px; }
         .page-heading { margin-bottom: 28px; }
@@ -180,6 +193,8 @@
         }
         .empty-state h2 { margin-bottom: 7px; font-size: 1.2rem; }
         .empty-state p { max-width: 440px; margin: 0 auto; color: var(--muted); }
+
+        /* Footer */
         .site-footer { border-top: 1px solid var(--line); background: white; }
         .footer-wrap {
             display: grid;
@@ -210,6 +225,8 @@
             text-align: right;
             font-size: .8rem;
         }
+
+        /* Small-screen header and footer adjustments */
         @media (max-width: 560px) {
             .nav-wrap, .footer-wrap, .page-wrap { width: min(100% - 28px, 1100px); }
             .nav-wrap { min-height: 68px; gap: 10px; }
@@ -222,7 +239,7 @@
             .footer-bottom { justify-content: flex-start; flex-wrap: wrap; text-align: left; }
         }
 
-/* Compact note cards and full-note detail page */
+/* Notes: cards and detail view */
 .note-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 235px), 1fr)); gap: 14px; }
 .note-card-link { display: block; color: inherit; text-decoration: none; }
 .note-card {
@@ -266,7 +283,7 @@
 .detail-card__content { padding-top: 24px; color: #454b60; overflow-wrap: anywhere; }
 .detail-card__content p:last-child { margin-bottom: 0; }
 
-/* Keep note previews clean and make only the title interactive. */
+/* Note-card interactions and preview text */
 .note-card { transition: border-color .18s ease, box-shadow .18s ease; }
 .note-card:hover { transform: none; border-color: #d8d5fa; box-shadow: 0 12px 28px rgba(33, 37, 66, .07); }
 .note-card h2 { margin-bottom: 9px; }
@@ -283,6 +300,7 @@
     white-space: nowrap;
 }
 
+/* Back navigation */
 .back-button {
     display: inline-flex;
     align-items: center;
@@ -310,7 +328,7 @@
     outline-offset: 3px;
 }
 
-/* Light and dark theme colors */
+/* Theme colors */
 :root[data-theme="dark"] {
     color-scheme: dark;
     --ink: #edf0fa;
@@ -356,7 +374,7 @@
     .theme-toggle { min-height: 36px; padding: 7px 9px; font-size: .8rem; }
 }
 
-/* Icon-only theme switch */
+/* Theme toggle */
 .theme-toggle {
     width: 42px;
     height: 42px;
@@ -465,7 +483,7 @@
     .nav-links { flex-wrap: nowrap; justify-content: flex-end; gap: 4px; }
 }
 
-/* Tablet and phone layouts */
+/* Shared tablet and phone layouts */
 @media (max-width: 760px) {
     .nav-wrap {
         min-height: 68px;
@@ -674,7 +692,7 @@
     .preview-note p { font-size: .8rem; }
 }
 
-/* Focused, phone-like writing surface for new notes */
+/* New-note writing surface */
 .visually-hidden {
     width: 1px;
     height: 1px;
