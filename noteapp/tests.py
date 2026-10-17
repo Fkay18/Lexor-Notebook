@@ -7,6 +7,7 @@ from django.test import TestCase, override_settings
 
 from rest_framework.test import APIClient
 
+from .forms import SignUpForm
 from .models import Note
 
 
@@ -54,6 +55,42 @@ class PublicHomeAndAuthenticationTests(TestCase):
         self.assertNotContains(response, 'Required. 150 characters or fewer.')
         self.assertContains(response, 'data-password-toggle="id_password1"')
         self.assertContains(response, 'data-password-toggle="id_password2"')
+        self.assertContains(response, 'noteapp/js/auth.')
+
+    def test_signup_accepts_a_password_with_eight_characters_without_complexity_rules(self):
+        form = SignUpForm(data={
+            'username': 'simple-password',
+            'email': 'simple-password@example.com',
+            'password1': 'abcdefgh',
+            'password2': 'abcdefgh',
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+        short_password_form = SignUpForm(data={
+            'username': 'short-password',
+            'email': 'short-password@example.com',
+            'password1': 'abcdefg',
+            'password2': 'abcdefg',
+        })
+        self.assertFalse(short_password_form.is_valid())
+        self.assertIn('password2', short_password_form.errors)
+
+    def test_signup_explains_duplicate_email_and_offers_account_recovery(self):
+        response = self.client.post(
+            '/accounts/sign-up/',
+            {
+                'username': 'another-reader',
+                'email': ' READER@EXAMPLE.COM ',
+                'password1': 'abcdefgh',
+                'password2': 'abcdefgh',
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'This email is already linked to an account.')
+        self.assertContains(response, 'href="/accounts/sign-in/"')
+        self.assertContains(response, 'href="/accounts/password-reset/"')
 
     def test_signup_logs_user_in_and_returns_to_their_notes(self):
         response = self.client.post(

@@ -18,13 +18,18 @@
                     {% if field.name == 'password1' or field.name == 'password2' %}
                         <div class="password-input-wrap">
                             {{ field }}
-                            <button class="password-toggle" type="button" data-password-toggle="{{ field.id_for_label }}" aria-controls="{{ field.id_for_label }}" aria-label="Show password">Show</button>
+                            <button class="password-toggle" type="button" data-password-toggle="{{ field.id_for_label }}" aria-controls="{{ field.id_for_label }}" aria-label="Show password" aria-pressed="false">Show</button>
                         </div>
                     {% else %}
                         {{ field }}
                     {% endif %}
                     {% if field.help_text %}<div class="field-help">{{ field.help_text|safe }}</div>{% endif %}
-                    {% if field.errors %}<div class="field-errors" role="alert">{{ field.errors }}</div>{% endif %}
+                    {% if field.errors %}
+                        <div class="field-errors" role="alert">{{ field.errors }}</div>
+                        {% if field.name == 'email' %}
+                            <div class="field-help">Already have an account? <a href="{% url 'login' %}">Log in</a> or <a href="{% url 'password_reset' %}">reset your password</a>.</div>
+                        {% endif %}
+                    {% endif %}
                 </div>
             {% endfor %}
             <button class="auth-submit" type="submit">Create account</button>

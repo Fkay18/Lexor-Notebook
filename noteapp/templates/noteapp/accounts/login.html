@@ -19,7 +19,7 @@
                     {% if field.name == 'password' %}
                         <div class="password-input-wrap">
                             {{ field }}
-                            <button class="password-toggle" type="button" data-password-toggle="{{ field.id_for_label }}" aria-controls="{{ field.id_for_label }}" aria-label="Show password">Show</button>
+                            <button class="password-toggle" type="button" data-password-toggle="{{ field.id_for_label }}" aria-controls="{{ field.id_for_label }}" aria-label="Show password" aria-pressed="false">Show</button>
                         </div>
                     {% else %}
                         {{ field }}
